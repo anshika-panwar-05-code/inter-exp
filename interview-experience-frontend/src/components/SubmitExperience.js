@@ -9,6 +9,7 @@ const SubmitExperience = () => {
   const [questions, setQuestions] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(null);
+  const [isSubmitted, setIsSubmitted] = useState(false); // New state to track submission
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -50,7 +51,13 @@ const SubmitExperience = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       
-      navigate('/submissions');
+      // Reset form and display success message
+      setIsSubmitted(true);
+      setName('');
+      setCountry('');
+      setCompany('');
+      setQuestions('');
+      setErrorMessage('Your experience has been successfully submitted.');
     } catch (err) {
       console.error('Error submitting experience:', err);
       if (err.response && err.response.status === 401) {
@@ -84,49 +91,64 @@ const SubmitExperience = () => {
       <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Submit Interview Experience</h2>
         {errorMessage && <p className="text-red-500 text-center mb-4">{errorMessage}</p>}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            placeholder="Your Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <input
-            type="text"
-            placeholder="Country"
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
-            required
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <input
-            type="text"
-            placeholder="Company"
-            value={company}
-            onChange={(e) => setCompany(e.target.value)}
-            required
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <input
-            type="text"
-            placeholder="Interview Questions (comma separated)"
-            value={questions}
-            onChange={(e) => setQuestions(e.target.value)}
-            required
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            type="submit"
-            className="w-full py-3 bg-green-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-          >
-            Submit
-          </button>
-        </form>
+        
+        {/* If the experience was successfully submitted, show a success message and reset the form */}
+        {isSubmitted ? (
+          <div className="text-green-500 text-center mb-4">
+            <p>Your experience has been successfully submitted!</p>
+            <button 
+              onClick={() => setIsSubmitted(false)} 
+              className="mt-4 text-blue-500 hover:underline"
+            >
+              Submit Another Experience
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="text"
+              placeholder="Your Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <input
+              type="text"
+              placeholder="Country"
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              required
+              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <input
+              type="text"
+              placeholder="Company"
+              value={company}
+              onChange={(e) => setCompany(e.target.value)}
+              required
+              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <input
+              type="text"
+              placeholder="Interview Questions (comma separated)"
+              value={questions}
+              onChange={(e) => setQuestions(e.target.value)}
+              required
+              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              type="submit"
+              className="w-full py-3 bg-green-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+            >
+              Submit
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
 };
 
 export default SubmitExperience;
+
