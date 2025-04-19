@@ -20,10 +20,13 @@ if (!JWT_SECRET || !MONGO_URI) {
 }
 
 // ✅ CORS for Local + Render Frontend
+const cors = require('cors');
 app.use(cors({
-  origin: ['https://inter-exp-fronted.onrender.com', 'http://localhost:3000'], // Add localhost for local testing
-  credentials: true,
+  origin: 'https://inter-exp-fronted.onrender.com', // Your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
 
 app.use(express.json());
 
