@@ -17,7 +17,7 @@ const Submissions = () => {
     const fetchSubmissions = async () => {
       const token = localStorage.getItem('token');
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/submissions`, {
+        const response = await axios.get('https://inter-experience.onrender.com/submissions', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -43,7 +43,7 @@ const Submissions = () => {
   const handleDelete = async (id) => {
     const token = localStorage.getItem('token');
     try {
-      await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/submissions/${id}`, {
+      await axios.delete(`https://inter-experience.onrender.com/submissions/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -68,7 +68,7 @@ const Submissions = () => {
   const handleSave = async () => {
     const token = localStorage.getItem('token');
     try {
-      await axios.put(`${process.env.REACT_APP_API_BASE_URL}/submissions/${editId}`, {
+      await axios.put(`https://inter-experience.onrender.com/submissions/${editId}`, {
         ...formData,
         questions: formData.questions.split(',').map((q) => q.trim()),
       }, {
