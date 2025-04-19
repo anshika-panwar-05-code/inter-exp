@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const BASE_URL = "https://inter-experience.onrender.com";
+const BASE_URL = "https://inter-experience.onrender.com"
 
 const Login = () => {
   const [email, setEmail] = useState('');
