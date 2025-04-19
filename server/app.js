@@ -10,35 +10,36 @@ const Submission = require('./models/Submission');
 dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 5000;
+const JWT_SECRET = process.env.JWT_SECRET;
+const MONGO_URI = process.env.MONGO_URI;
 
-// CORS configuration to allow the frontend URL
+// ✅ Check for required env variables
+if (!JWT_SECRET || !MONGO_URI) {
+  throw new Error("Missing environment variables. Ensure JWT_SECRET and MONGO_URI are set.");
+}
+
+// ✅ CORS for Local + Render Frontend
 app.use(cors({
   origin: [
-    'http://localhost:3000', // Allow localhost
-    'http://192.168.9.68:3000' // Allow network IP address
+    'http://localhost:3000',
+    'http://192.168.9.68:3000',
+    'https://interview-experience-frontend-qe6m.onrender.com'
   ],
-  methods: 'GET, POST, PUT, DELETE',
-  allowedHeaders: 'Content-Type, Authorization',
+  methods: 'GET,POST,PUT,DELETE',
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
-
 
 app.use(express.json());
 
-const PORT = process.env.PORT || 5000;
-const JWT_SECRET = process.env.JWT_SECRET;
+// ✅ MongoDB Connection
+mongoose.connect(MONGO_URI)
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch(err => console.error("❌ MongoDB connection error:", err));
 
-if (!JWT_SECRET) {
-  throw new Error("JWT_SECRET is not defined in the environment variables.");
-}
-
-// MongoDB connection
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error("MongoDB Atlas connection error:", err));
-
-// Auth middleware to verify JWT
+// ✅ Middleware to verify JWT
 const authenticate = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1]; // Get token from header
+  const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ message: 'Unauthorized' });
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
@@ -48,20 +49,23 @@ const authenticate = (req, res, next) => {
   });
 };
 
-// Register route
+// ✅ Auth Routes
 app.post('/register', async (req, res) => {
   const { email, password } = req.body;
   try {
+    const userExists = await User.findOne({ email });
+    if (userExists) return res.status(409).json({ message: 'User already exists' });
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({ email, password: hashedPassword });
     await newUser.save();
+
     res.status(201).json({ message: 'User registered successfully' });
   } catch (err) {
     res.status(400).json({ message: 'Error registering user', error: err.message });
   }
 });
 
-// Login route
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -78,12 +82,12 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Protected route
+// ✅ Protected Route Test
 app.get('/protected', authenticate, (req, res) => {
   res.json({ message: `Welcome ${req.user.email}, you have accessed a protected route!` });
 });
 
-// Create submission
+// ✅ Submission Routes
 app.post('/submissions', authenticate, async (req, res) => {
   const { name, country, company, questions } = req.body;
   try {
@@ -101,16 +105,10 @@ app.post('/submissions', authenticate, async (req, res) => {
   }
 });
 
-// Get all submissions with optional search by company name
 app.get('/submissions', authenticate, async (req, res) => {
-  const { company } = req.query;  // Search query for company name
-
+  const { company } = req.query;
   try {
-    let query = {};
-    if (company) {
-      query.company = new RegExp(company, 'i');  // Use case-insensitive regex for matching
-    }
-
+    const query = company ? { company: new RegExp(company, 'i') } : {};
     const submissions = await Submission.find(query).populate('userId', 'email');
     res.json(submissions);
   } catch (err) {
@@ -118,7 +116,6 @@ app.get('/submissions', authenticate, async (req, res) => {
   }
 });
 
-// Get specific submission
 app.get('/submissions/:id', authenticate, async (req, res) => {
   try {
     const submission = await Submission.findOne({ _id: req.params.id, userId: req.user.id });
@@ -129,7 +126,6 @@ app.get('/submissions/:id', authenticate, async (req, res) => {
   }
 });
 
-// Edit submission
 app.put('/submissions/:id', authenticate, async (req, res) => {
   const { name, country, company, questions } = req.body;
   try {
@@ -145,18 +141,17 @@ app.put('/submissions/:id', authenticate, async (req, res) => {
   }
 });
 
-// Delete submission
 app.delete('/submissions/:id', authenticate, async (req, res) => {
   try {
     const deletedSubmission = await Submission.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
     if (!deletedSubmission) return res.status(404).json({ message: 'Submission not found' });
-    res.json({ message: 'Submission deleted' });
+    res.json({ message: 'Submission deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: 'Error deleting submission', error: err.message });
   }
 });
 
-// Start the server on the given port
+// ✅ Start the Server
 app.listen(PORT, () => {
-  console.log(`Server running on http://192.168.9.68:${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
