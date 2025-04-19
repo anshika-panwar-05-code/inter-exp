@@ -21,13 +21,8 @@ if (!JWT_SECRET || !MONGO_URI) {
 
 // ✅ CORS for Local + Render Frontend
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'http://192.168.9.68:3000',
-    'https://interview-experience-frontend-qe6m.onrender.com'
-  ],
-  methods: 'GET,POST,PUT,DELETE',
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  origin: 'https://interview-experience-frontend-qe6m.onrender.com', // ✅ Add your frontend domain
+  credentials: true, // If you're using cookies or authorization headers
 }));
 
 app.use(express.json());
