@@ -21,8 +21,8 @@ if (!JWT_SECRET || !MONGO_URI) {
 
 // ✅ CORS for Local + Render Frontend
 app.use(cors({
-  origin: 'https://inter-exp-fronted.onrender.com', // ✅ Add your frontend domain
-  credentials: true, // If you're using cookies or authorization headers
+  origin: ['https://inter-exp-fronted.onrender.com', 'http://localhost:3000'], // Add localhost for local testing
+  credentials: true,
 }));
 
 app.use(express.json());
