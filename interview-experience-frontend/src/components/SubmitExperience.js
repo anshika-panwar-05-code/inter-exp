@@ -32,12 +32,20 @@ const SubmitExperience = () => {
       return;
     }
 
+    const questionList = questions.split(',').map((q) => q.trim());
+    
+    // ✅ Check if the number of questions exceeds 15
+    if (questionList.length > 15) {
+      setErrorMessage('You can only enter a maximum of 15 questions.');
+      return;
+    }
+
     try {
       await axios.post('https://inter-experience.onrender.com/submissions', {
         name,
         country,
         company,
-        questions: questions.split(',').map((q) => q.trim()),
+        questions: questionList,
       }, {
         headers: { Authorization: `Bearer ${token}` },
       });
