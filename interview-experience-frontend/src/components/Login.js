@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-const BASE_URL = "https://inter-experience.onrender.com"
+const BASE_URL = "https://inter-experience.onrender.com";
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -12,32 +13,19 @@ const Login = () => {
 
   const navigate = useNavigate();
 
- const handleLogin = async () => {
-  try {
-    const response = await axios.post(`${BASE_URL}/login`, { email, password });
-    const data = response.data;
-    
-    if (response.status === 200) {
-      localStorage.setItem('token', data.token);
-      setToken(data.token);
-      setMessage('Login successful!');
-      navigate('/submissions');
-    }
-  } catch (err) {
-    setError(err.response?.data?.message || 'Login failed');
-  }
-};
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post(`${BASE_URL}/login`, { email, password });
+      const data = response.data;
 
-
-    const data = await response.json();
-
-    if (response.ok) {
-      localStorage.setItem('token', data.token);
-      setToken(data.token);
-      setMessage('Login successful!');
-      navigate('/submissions');
-    } else {
-      setError(data.message || 'Login failed');
+      if (response.status === 200) {
+        localStorage.setItem('token', data.token);
+        setToken(data.token);
+        setMessage('Login successful!');
+        navigate('/submissions');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed');
     }
   };
 
