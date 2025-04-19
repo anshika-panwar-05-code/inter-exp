@@ -12,12 +12,22 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
-    const response = await fetch(`${BASE_URL}/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+ const handleLogin = async () => {
+  try {
+    const response = await axios.post(`${BASE_URL}/login`, { email, password });
+    const data = response.data;
+    
+    if (response.status === 200) {
+      localStorage.setItem('token', data.token);
+      setToken(data.token);
+      setMessage('Login successful!');
+      navigate('/submissions');
+    }
+  } catch (err) {
+    setError(err.response?.data?.message || 'Login failed');
+  }
+};
+
 
     const data = await response.json();
 
