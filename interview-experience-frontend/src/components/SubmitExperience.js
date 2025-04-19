@@ -33,7 +33,7 @@ const SubmitExperience = () => {
     }
 
     try {
-      await axios.post(`${process.env.REACT_APP_API_BASE_URL}/submissions`, {
+      await axios.post('https://inter-experience.onrender.com/submissions', {
         name,
         country,
         company,
